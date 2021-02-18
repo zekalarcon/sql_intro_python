@@ -11,8 +11,8 @@ Programa creado para poner a prueba los conocimientos
 adquiridos durante la clase
 '''
 
-__author__ = "Inove Coding School"
-__email__ = "alumnos@inove.com.ar"
+__author__ = "Ezequiel Alarcon"
+__email__ = "zekalarcon@gmail.com"
 __version__ = "1.1"
 
 import sqlite3
@@ -68,12 +68,34 @@ def fill():
     # Observar que hay campos como "grade" y "tutor" que no son obligatorios
     # en el schema creado, puede obivar en algunos casos completar esos campos
 
+    conn = sqlite3.connect('secundaria.db')
+    cur = conn.cursor()
+
+    estudiantes = [['DIEGO COSTA', 32, 1, 'DIEGO SIMEONE'],
+                   ['JOAO FELIX', 21, 1, 'DIEGO SIMEONE'],
+                   ['ALEJANDRO NORIEGA', 36, 2, 'RODOLFO DELLA PICCA'],
+                   ['EZEQUIEL CACACE', 37, 2, 'RODOLFO DELLA PICCA'],
+                   ['CARLES SANTOLO', 23, 3, 'OSCAR FERNANDEZ NOVILLO'],
+                   ['IVAN RIVEIRO', 20, 3, 'OSCAR FERNANDEZ NOVILLO']
+                  ]
+
+    cur.executemany("INSERT INTO estudiante (id, name, age, grade, tutor) values (NULL, ?, ?, ?, ?)", estudiantes)
+
+    conn.commit()
+    conn.close()
+
 
 def fetch():
     print('Comprovemos su contenido, ¿qué hay en la tabla?')
     # Utilizar la sentencia SELECT para imprimir en pantalla
     # todas las filas con todas sus columnas
     # Utilizar fetchone para imprimir de una fila a la vez
+
+    conn = sqlite3.connect('secundaria.db')
+    cur = conn.cursor()
+
+    for row in cur.execute("SELECT * FROM estudiante"):
+        print(row)
 
 
 def search_by_grade(grade):
@@ -85,11 +107,25 @@ def search_by_grade(grade):
     # las siguientes columnas por fila encontrada:
     # id / name / age
 
+    conn = sqlite3.connect('secundaria.db')
+    cur = conn.cursor()
 
-def insert(grade):
+    for row in cur.execute("SELECT id, name, age FROM estudiante WHERE grade =?",str(grade)):
+        print(row)
+
+
+def insert(new_student):
     print('Nuevos ingresos!')
     # Utilizar la sentencia INSERT para ingresar nuevos estudiantes
     # a la secundaria
+
+    conn = sqlite3.connect('secundaria.db')
+    cur = conn.cursor()
+
+    cur.execute("INSERT INTO estudiante ( name, age) values (?, ?)", new_student)
+
+    conn.commit()
+    conn.close()
 
 
 def modify(id, name):
@@ -98,19 +134,26 @@ def modify(id, name):
     # cuyo id sea el "id" pasado como parámetro,
     # modificar su nombre por "name" pasado como parámetro
 
+    conn = sqlite3.connect('secundaria.db')
+    cur = conn.cursor()
+
+    cur.execute("UPDATE estudiante SET name = ? WHERE id =?", (name, str(id)))
+
+    conn.commit()
+    conn.close()
 
 if __name__ == '__main__':
     print("Bienvenidos a otra clase de Inove con Python")
     create_schema()   # create and reset database (DB)
-    # fill()
-    # fetch()
+    fill()
+    fetch()
 
     grade = 3
-    # search_by_grade(grade)
+    search_by_grade(grade)
 
     new_student = ['You', 16]
-    # insert(new_student)
+    insert(new_student)
 
     name = '¿Inove?'
     id = 2
-    # modify(id, name)
+    modify(id, name)
